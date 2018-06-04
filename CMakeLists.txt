@@ -15,6 +15,10 @@ else()
   find_package(Geant4 REQUIRED)
 endif()
 
+execute_process(COMMAND root-config --etcdir OUTPUT_VARIABLE ROOT_ETC)
+string(REGEX REPLACE "\n$" "" ROOT_ETC "${ROOT_ETC}")
+LIST(APPEND CMAKE_MODULE_PATH "${ROOT_ETC}/cmake")
+
 find_package(ROOT REQUIRED)
 
 #----------------------------------------------------------------------------

@@ -110,6 +110,9 @@ EventAction::EndOfEventAction(const G4Event* evt)
     
     // average time of PMT hits
     for (G4int i=0; i<P_hits; i++) {
+
+      cout << "PMT hit=" << ", id=" << (*PHC)[i]->GetHitId() << endl;
+
       G4double time = ( (*PHC)[i]->GetTime() - firstLXeHitTime );
       aveTimePmtHits += time / (G4double)P_hits;
       hitMap[(*PHC)[i]->GetHitId()]++; // count PE
@@ -176,8 +179,12 @@ EventAction::EndOfEventAction(const G4Event* evt)
     if (edep/keV>0 || nph>0 || nPE>0) {
       analysisManager->FillH1(3, i);
       count++;
-      cout << "Cell " << i << " edep=" << edep/keV << "keV ph=" << nph << " yield=" << nph/(edep/keV) <<  " ph/keV "
-	   << ", dEdX=" << edep/(length*3.67*g/cm3) / MeV *g/cm2 << " MeV g/cm2" << " nPE=" << nPE
+      cout << "Cell=" << i
+           << ", lay/row/col=" << idLay << "/" << row << "/" << col 
+           << ", edep=" << edep/keV << "keV, ph=" << nph << ", yield=" << nph/(edep/keV) <<  " ph/keV "
+           << ", length=" << length/cm << " cm"
+           << ", dEdX=" << edep/(length*3.67*g/cm3) / MeV *g/cm2 << " MeV g/cm2"
+           << ", nPE=" << nPE
 	   << " eff_opt=" << nPE/nph
 	   <<  endl;            
 

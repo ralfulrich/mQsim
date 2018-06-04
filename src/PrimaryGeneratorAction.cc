@@ -141,7 +141,8 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(const std::string& name)
     // data->Close();
     
     if (!fHistEnergy || !fHistZenith) {
-      cout << "wrong input data" << endl;
+      cout << "PrimaryGeneratorAction: wrong input data. pdg=" << pdg << endl;
+      data->ls();
       exit(1);
     }
 

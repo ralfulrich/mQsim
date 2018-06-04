@@ -38,7 +38,7 @@ main(int argc, char** argv)
 #endif
 
   if (argc>1 && argc!=4) {
-    cout << "either start without arguments for GUI, or specify: mu+/mu-  nEvt" << endl;
+    cout << "either start without arguments for GUI, or specify: mu+/mu-/mpc-  nEvt  mQ" << endl;
     return 1;
   }
   
