@@ -79,7 +79,7 @@ main(int argc, char** argv)
   } else {
     runManager->BeamOn(nEvt);
   }
-#elif
+#else
   runManager->BeamOn(nEvt);
 #endif
 
