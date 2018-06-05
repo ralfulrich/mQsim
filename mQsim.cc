@@ -17,7 +17,6 @@
 #include "G4RunManager.hh"
 //#endif
 
-#include "G4UImanager.hh"
 #include "RunAction.hh"
 #include "EventAction.hh"
 #include "PrimaryGeneratorAction.hh"
@@ -29,13 +28,13 @@
 #include "G4VisExecutive.hh"
 #endif
 
+#include "G4UImanager.hh"
 
 #ifdef G4UI_USE
 #warning ui-use
 #include "G4UIExecutive.hh"
 #endif
 
-#include "G4UItcsh"
 
 #include <iostream>
 using namespace std;
@@ -47,16 +46,11 @@ using namespace std;
 int
 main(int argc, char** argv)
 {
-
-#ifdef G4UI_USE
-  // Detect interactive mode (if no arguments) and define UI session
-  //
   G4UIExecutive* ui = 0;
   if ( argc == 1 ) {
     ui = new G4UIExecutive(argc, argv);
   }
-#endif
-
+  
   //#ifdef G4MULTITHREADED
   //  auto runManager = new G4MTRunManager;
   //#else
@@ -111,13 +105,26 @@ main(int argc, char** argv)
   
 #ifdef G4VIS_USE
   UImanager->ApplyCommand("/control/execute vis.mac"); 
-  G4UIsession* session = new G4UIterminal(new G4UItcsh);
-  session->SessionStart();
-#else
-  UImanager->ApplyCommand("/control/execute init.mac"); 
+  //G4UIsession* session = new G4UIterminal(new G4UItcsh);
+  //session->SessionStart();
 #endif
-    
-#if defined(G4UI_USE_QT)
+  
+  //UImanager->ApplyCommand("/control/execute init.mac"); 
+  
+  // Process macro or start UI session
+  //
+  if ( ! ui ) { 
+    // batch mode
+    runManager->BeamOn(nEvt);
+  }  
+  else { 
+    // interactive mode
+    //UImanager->ApplyCommand("/control/execute vis.mac");
+    ui->SessionStart();
+    delete ui;
+  }
+
+  /*#if defined(G4UI_USE_QT)
   if (!batch) {
     G4UIQt* ui = new G4UIQt(argc, argv);
     ui->SessionStart();
@@ -129,7 +136,8 @@ main(int argc, char** argv)
 #else
   runManager->BeamOn(nEvt);
 #endif
-
+  */
+  
   cout << " TIME: " << gun->GetSeonds() << " seconds" << endl;
 
 #ifdef G4VIS_USE
