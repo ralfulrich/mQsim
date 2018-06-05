@@ -36,8 +36,6 @@
 #include "G4LogicalBorderSurface.hh"
 #include "G4SubtractionSolid.hh"
 
-#include "G4SDManager.hh"
-
 #include <iostream>
 using namespace std;
 
@@ -72,7 +70,7 @@ DetectorConstructionDet::~DetectorConstructionDet()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo...... 
 G4VPhysicalVolume* DetectorConstructionDet::Construct()
 {
-  const double Qe = fQe;
+  //const double Qe = fQe;
 
   //-------------------------------------------------------------------------
   // Materials
@@ -466,9 +464,9 @@ G4VPhysicalVolume* DetectorConstructionDet::Construct()
 			    "Cathode");         // its name
 
     
-    G4VPhysicalVolume* pv_cathode = 
-      new G4PVPlacement(0, G4ThreeVector(0, 0, heightCrystal/2+crystalCase/2),
-			cathodeLV, "Cathode", crystalAssemblyLV, false, 0, checkOverlays);
+    //G4VPhysicalVolume* pv_cathode = 
+    new G4PVPlacement(0, G4ThreeVector(0, 0, heightCrystal/2+crystalCase/2),
+		      cathodeLV, "Cathode", crystalAssemblyLV, false, 0, checkOverlays);
     /*
     G4VPhysicalVolume* pv_cathode = 
       new G4PVPlacement(0, G4ThreeVector(0, 0, heightCrystal/2-crystalCase/2),
@@ -575,7 +573,7 @@ G4VPhysicalVolume* DetectorConstructionDet::Construct()
 
 void DetectorConstructionDet::ConstructSDandField()
 {
-  // G4SDManager::GetSDMpointer()->SetVerboseLevel(1);
+  auto sdManager = G4SDManager::GetSDMpointer();
 
   // 
   // Sensitive detectors
@@ -583,10 +581,11 @@ void DetectorConstructionDet::ConstructSDandField()
   // int nofChannel = 3 * 20 * 20;  
   fSciSD = new DetectorSD("Scintillator", "ScintillatorHitsCollection", nlay, nGrid);
   //SetSensitiveDetector("SciCol", sciSD);
+  sdManager->AddNewDetector(fSciSD);
   SetSensitiveDetector("SciBlock", fSciSD);
-
-
+  
   PMTSD* aSD = new PMTSD("/Det/pmtSD");
+  sdManager->AddNewDetector(aSD);
   SetSensitiveDetector("Cathode", aSD);
 		       
   /*

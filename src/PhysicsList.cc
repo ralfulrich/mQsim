@@ -1,5 +1,7 @@
 #include "PhysicsList.hh"
 
+#include "G4PhysicsListHelper.hh"
+
 #include "G4DecayPhysics.hh"
 #include "G4EmStandardPhysics.hh"
 #include "G4EmExtraPhysics.hh"
@@ -29,8 +31,12 @@
 #include "G4MuBremsstrahlung.hh"
 #include "G4MuPairProduction.hh"
 
+#include "CLHEP/Units/PhysicalConstants.h"
+
 #include <iostream>
+
 using namespace std;
+using namespace CLHEP;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 PhysicsList::PhysicsList(double qe):  G4VUserPhysicsList(), fQe(qe)
@@ -116,6 +122,7 @@ PhysicsList::AddTransportation()
 {  
   G4VUserPhysicsList::AddTransportation();
   
+  auto theParticleIterator=GetParticleIterator();
   theParticleIterator->reset();
   while( (*theParticleIterator)() ){
     G4ParticleDefinition* particle = theParticleIterator->value();
@@ -196,6 +203,7 @@ void PhysicsList::ConstructEM() {
   opt.SetDEDXBinning(200);
   opt.SetLambdaBinning(200);
 
+  auto theParticleIterator=GetParticleIterator();
   theParticleIterator->reset();
   while( (*theParticleIterator)() ){
     G4ParticleDefinition* particle = theParticleIterator->value();
@@ -394,6 +402,7 @@ void PhysicsList::ConstructOp()
   // theRayleighScatteringProcess->SetVerboseLevel(OpVerbLevel);
   theBoundaryProcess->SetVerboseLevel(OpVerbLevel);
 
+  auto theParticleIterator=GetParticleIterator();
   theParticleIterator->reset();
   while( (*theParticleIterator)() )
     {
@@ -559,6 +568,7 @@ PhysicsList::ConstructHad()
   G4ComponentGGNuclNuclXsc * ggNuclNuclXsec = new G4ComponentGGNuclNuclXsc();
   G4VCrossSectionDataSet * theGGNuclNuclData = new G4CrossSectionInelastic(ggNuclNuclXsec);
 
+  auto theParticleIterator=GetParticleIterator();
   theParticleIterator->reset();
   while ((*theParticleIterator)()) 
     {
@@ -815,6 +825,7 @@ void PhysicsList::ConstructGeneral() {
 
   // Add Decay Process
   G4Decay* theDecayProcess = new G4Decay();
+  auto theParticleIterator=GetParticleIterator();
   theParticleIterator->reset();
   while( (*theParticleIterator)() )
     {

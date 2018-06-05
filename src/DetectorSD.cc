@@ -101,6 +101,9 @@ G4bool DetectorSD::ProcessHits(G4Step* step,
     //    cout << touchable->GetVolume()->
     //}
   
+
+  if (!fHitsCollection)
+    return true;
   
   // Get hit accounting data for this cell
   DetectorHit* hit = (*fHitsCollection)[layerNumber];
@@ -134,6 +137,9 @@ G4bool DetectorSD::ProcessHits(G4Step* step,
 
 void DetectorSD::EndOfEvent(G4HCofThisEvent*)
 {
+  if (!fHitsCollection)
+    return;
+
   if ( verboseLevel>1 ) { 
      G4int nofHits = fHitsCollection->entries();
      G4cout

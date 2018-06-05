@@ -1,4 +1,3 @@
-#include "G4RunManager.hh"
 
 #if defined(G4UI_USE_QT)
 #include "G4UIQt.hh"
@@ -9,6 +8,16 @@
 #include "DetectorConstructionDet.hh"
 #include "PhysicsList.hh"
 
+
+//#ifdef G4MULTITHREADED
+//#warning multi-threaded
+//#include "G4MTRunManager.hh"
+//#else
+#warning not-multi-threaded
+#include "G4RunManager.hh"
+//#endif
+
+#include "G4UImanager.hh"
 #include "RunAction.hh"
 #include "EventAction.hh"
 #include "PrimaryGeneratorAction.hh"
@@ -16,8 +25,17 @@
 #include "StackingAction.hh"
 
 #ifdef G4VIS_USE
+#warning vis-use
 #include "G4VisExecutive.hh"
 #endif
+
+
+#ifdef G4UI_USE
+#warning ui-use
+#include "G4UIExecutive.hh"
+#endif
+
+#include "G4UItcsh"
 
 #include <iostream>
 using namespace std;
@@ -29,11 +47,28 @@ using namespace std;
 int
 main(int argc, char** argv)
 {
- G4RunManager * runManager = new G4RunManager;
+
+#ifdef G4UI_USE
+  // Detect interactive mode (if no arguments) and define UI session
+  //
+  G4UIExecutive* ui = 0;
+  if ( argc == 1 ) {
+    ui = new G4UIExecutive(argc, argv);
+  }
+#endif
+
+  //#ifdef G4MULTITHREADED
+  //  auto runManager = new G4MTRunManager;
+  //#else
+  auto runManager = new G4RunManager;
+  //#endif
+
 
 #ifdef G4VIS_USE
   // Visualization manager construction
-  G4VisManager* visManager = new G4VisExecutive;
+  auto visManager = new G4VisExecutive;
+  // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
+  // G4VisManager* visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
 #endif
 
@@ -69,7 +104,19 @@ main(int argc, char** argv)
   runManager->SetUserAction(new EventAction());
   
   runManager->Initialize();
+
+
+  // Get the pointer to the User Interface manager
+  auto UImanager = G4UImanager::GetUIpointer();
   
+#ifdef G4VIS_USE
+  UImanager->ApplyCommand("/control/execute vis.mac"); 
+  G4UIsession* session = new G4UIterminal(new G4UItcsh);
+  session->SessionStart();
+#else
+  UImanager->ApplyCommand("/control/execute init.mac"); 
+#endif
+    
 #if defined(G4UI_USE_QT)
   if (!batch) {
     G4UIQt* ui = new G4UIQt(argc, argv);
