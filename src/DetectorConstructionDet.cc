@@ -42,12 +42,11 @@ using namespace std;
 const double depth_tunnel = 80 * meter; // bei 2.2mm->1.2m, bei 6.5mm->3.5m
 const double height_tunnel = 2.5 * meter;
 
-const double angle = 43.1 * degree;
-const double rockIP5 = 17 * meter;
-const double distanceIP5 = 33 * meter;    
 
-const int nlay = 3;
-const int nGrid = 20;
+// DETECTOR DEFINITION
+const int DetectorConstructionDet::fgNumberLayers = 3;
+const int DetectorConstructionDet::fgNumberGrid = 20;
+
 const double wCell = 5*centimeter;
 const double crystalCase = 1*millimeter;
 const double heightCrystal = 0.80*meter;
@@ -55,6 +54,10 @@ const double distanceLayer = heightCrystal + 0.2*meter;
 
 const double heightPMT = 130*millimeter;
 const double radiusPMT = 2.4*centimeter;
+
+const double angle = 43.1 * degree;
+const double rockIP5 = 17 * meter;
+const double distanceIP5 = 33 * meter;    
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo...... 
@@ -302,7 +305,7 @@ G4VPhysicalVolume* DetectorConstructionDet::Construct()
     // --- one experiment
     G4VSolid* calorimeterS
       = new G4Box("Calorimeter",     // its name
-		  (wCell+2*crystalCase)*nGrid/2., (wCell+2*crystalCase)*nGrid/2., distanceLayer*nlay/2.); // its size
+		  (wCell+2*crystalCase)*fgNumberGrid/2., (wCell+2*crystalCase)*fgNumberGrid/2., distanceLayer*fgNumberLayers/2.); // its size
     
     G4LogicalVolume* calorLV
       = new G4LogicalVolume(calorimeterS,     // its solid
@@ -327,7 +330,7 @@ G4VPhysicalVolume* DetectorConstructionDet::Construct()
     //
     G4VSolid* layerS 
       = new G4Box("Layer",           // its name
-		  (wCell+2*crystalCase)*nGrid/2., (wCell+2*crystalCase)*nGrid/2., distanceLayer/2.);
+		  (wCell+2*crystalCase)*fgNumberGrid/2., (wCell+2*crystalCase)*fgNumberGrid/2., distanceLayer/2.);
     
     G4LogicalVolume* layerLV
       = new G4LogicalVolume(layerS,           // its solid
@@ -339,11 +342,11 @@ G4VPhysicalVolume* DetectorConstructionDet::Construct()
     layerLV->SetVisAttributes(layer_logVisAtt);*/
     layerLV->SetVisAttributes(G4VisAttributes::Invisible);
 
-    for (int ilay=0; ilay<nlay; ++ilay) {
+    for (int ilay=0; ilay<fgNumberLayers; ++ilay) {
       ostringstream layname;
       layname << "Layer_" << ilay;
       new G4PVPlacement(0,
-			G4ThreeVector(0,0,distanceLayer*(ilay-double(nlay-1)/2)),
+			G4ThreeVector(0,0,distanceLayer*(ilay-double(fgNumberLayers-1)/2)),
 			layerLV,
 			layname.str().c_str(),
 			calorLV,
@@ -356,17 +359,17 @@ G4VPhysicalVolume* DetectorConstructionDet::Construct()
     // one sci-bar grid row
     G4VSolid* rowS 
       = new G4Box("DetRow",           // its name
-		  (wCell+2*crystalCase)*nGrid/2., (wCell+2*crystalCase)/2., distanceLayer/2.);
+		  (wCell+2*crystalCase)*fgNumberGrid/2., (wCell+2*crystalCase)/2., distanceLayer/2.);
     
     G4LogicalVolume* rowLV
       = new G4LogicalVolume(rowS,           // its solid
 			    air,   // its material
 			    "DetRow");         // its name
 
-    // new G4PVReplica("DetRow", rowLV, layerLV, kYAxis, nGrid, wCell+2*crystalCase);
-    for (int igrid=0; igrid<nGrid; ++igrid) {
+    // new G4PVReplica("DetRow", rowLV, layerLV, kYAxis, fgNumberGrid, wCell+2*crystalCase);
+    for (int igrid=0; igrid<fgNumberGrid; ++igrid) {
       new G4PVPlacement(0,
-			G4ThreeVector(0, (wCell+2*crystalCase)*(igrid-double(nGrid-1)/2), 0),
+			G4ThreeVector(0, (wCell+2*crystalCase)*(igrid-double(fgNumberGrid-1)/2), 0),
 			rowLV,
 			"DetRow",
 			layerLV,
@@ -387,10 +390,10 @@ G4VPhysicalVolume* DetectorConstructionDet::Construct()
 			    air,   // its material
 			    "DetCol");         // its name
 
-    //new G4PVReplica("DetCol", colLV, rowLV, kXAxis, nGrid, (wCell+2*crystalCase));
-    for (int igrid=0; igrid<nGrid; ++igrid) {
+    //new G4PVReplica("DetCol", colLV, rowLV, kXAxis, fgNumberGrid, (wCell+2*crystalCase));
+    for (int igrid=0; igrid<fgNumberGrid; ++igrid) {
       new G4PVPlacement(0,
-			G4ThreeVector((wCell+2*crystalCase)*(igrid-double(nGrid-1)/2), 0, 0),
+			G4ThreeVector((wCell+2*crystalCase)*(igrid-double(fgNumberGrid-1)/2), 0, 0),
 			colLV,
 			"DetCol",
 			rowLV,
@@ -578,9 +581,7 @@ void DetectorConstructionDet::ConstructSDandField()
   // 
   // Sensitive detectors
   //
-  // int nofChannel = 3 * 20 * 20;  
-  fSciSD = new DetectorSD("Scintillator", "ScintillatorHitsCollection", nlay, nGrid);
-  //SetSensitiveDetector("SciCol", sciSD);
+  fSciSD = new DetectorSD("Scintillator", "ScintillatorHitsCollection", fgNumberLayers, fgNumberGrid);
   sdManager->AddNewDetector(fSciSD);
   SetSensitiveDetector("SciBlock", fSciSD);
   

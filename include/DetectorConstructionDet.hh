@@ -29,6 +29,10 @@ public:
   virtual G4VPhysicalVolume* Construct();
 
 
+  static const int fgNumberLayers;
+  static const int fgNumberGrid;
+  
+
 private:
   DetectorSD* fSciSD;
   double fQe;

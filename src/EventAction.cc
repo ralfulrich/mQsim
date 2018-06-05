@@ -11,7 +11,7 @@
 #include "G4SDManager.hh"
 #include "G4RunManager.hh"
 
-// #include "Randomize.h"
+#include "DetectorConstructionDet.hh"
 
 #include "G4SystemOfUnits.hh"
 
@@ -164,18 +164,19 @@ EventAction::EndOfEventAction(const G4Event* evt)
   int count = 0;
   for (int i=0; i<sciHC->entries()-1; ++i) {
 
-    const int nrow = 15;
-    const int nrow2 = nrow*nrow;
-    int idLay = i / nrow2;
-    int col = (i % nrow2) / nrow;
-    int row = (i % nrow2) % nrow;
+    const int nrow = DetectorConstructionDet::fgNumberGrid;
+    const int nrow2 = pow(nrow, 2);
+    const int idLay = i / nrow2;
+    const int col = (i % nrow2) / nrow;
+    const int row = (i % nrow2) % nrow;
     
     DetectorHit* thesciHit = (*sciHC)[i];
-    double edep = thesciHit->GetEdep();
-    double length = thesciHit->GetTrackLength();
-    double nph = thesciHit->GetPh();
-    double nPE = (hitMap.count(i) ? hitMap[i] : 0);
+    const double edep = thesciHit->GetEdep();
+    const double length = thesciHit->GetTrackLength();
+    const double nph = thesciHit->GetPh();
+    const double nPE = (hitMap.count(i) ? hitMap[i] : 0);
     thesciHit->SetNPE(int(nPE*0.2));
+    
     if (edep/keV>0 || nph>0 || nPE>0) {
       analysisManager->FillH1(3, i);
       count++;
@@ -199,17 +200,14 @@ EventAction::EndOfEventAction(const G4Event* evt)
       analysisManager->AddNtupleRow();  
     }
     
-    //int GetLayer(const int i) { return i % (fNGrid*fNGrid); }
-    //int GetColumn(const int i) { return (i / (fNGrid*fNGrid)) % fNGrid; }
-    //int GetRow(const int i) { return (i / (fNGrid*fNGrid)) / fNGrid; }
-    
     analysisManager->FillH2(1+idLay, col, row, edep/MeV);
-  }
+
+  } // loop sciHC hits
   
   analysisManager->FillH1(4, count);
   
   // check trigger
-  int nrow=15;
+  const int nrow = DetectorConstructionDet::fgNumberGrid;
   for (int i=0; i<nrow; ++i) {
     for (int j=0; j<nrow; ++j) {
       

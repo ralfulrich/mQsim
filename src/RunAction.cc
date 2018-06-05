@@ -7,15 +7,19 @@
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
 
+#include "DetectorConstructionDet.hh"
+
 #include "g4root.hh"
 
+#include <iostream>
+using namespace std;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo...... 
 RunAction::RunAction()
   :G4UserRunAction()
 {
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-  //   G4cout << "Using " << analysisManager->GetType() << G4endl;
+  G4cout << "Using " << analysisManager->GetType() << G4endl;
 
   // Create directories 
   //analysisManager->SetHistoDirectoryName("histograms");
@@ -31,12 +35,16 @@ RunAction::RunAction()
   analysisManager->CreateH1("trackL","trackL in sci", 100, 0., 1*m);
   analysisManager->CreateH1("channels","Channels", 1200, 0., 1200);
   analysisManager->CreateH1("mult","Mult", 100, 0., 100);
-  int nGrid = 15;
-  analysisManager->CreateH2("layer1","layer1", nGrid, 0., nGrid, nGrid, 0, nGrid);
-  analysisManager->CreateH2("layer2","layer2", nGrid, 0., nGrid, nGrid, 0, nGrid);
-  analysisManager->CreateH2("layer3","layer3", nGrid, 0., nGrid, nGrid, 0, nGrid);
-  analysisManager->CreateH2("layer4","layer4", nGrid, 0., nGrid, nGrid, 0, nGrid);
 
+  const int nGrid = DetectorConstructionDet::fgNumberGrid;
+  const int nlay = DetectorConstructionDet::fgNumberLayers;
+  
+  for (int i=0; i<nlay; ++i) {
+    ostringstream hname;
+    hname << "layer_" << i+1;
+    analysisManager->CreateH2(hname.str().c_str(), hname.str().c_str(), nGrid, 0., nGrid, nGrid, 0, nGrid);
+  }
+  
   // Create ntuple
   analysisManager->CreateNtuple("MCPsim", "hits");
   analysisManager->CreateNtupleDColumn("dEdX");
@@ -68,7 +76,7 @@ void RunAction::BeginOfRunAction(const G4Run* aRun)
 
   // Open an output file
   //
-  G4String fileName = "B4";
+  G4String fileName = "output";
   analysisManager->OpenFile(fileName);
 
 }
