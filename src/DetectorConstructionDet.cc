@@ -222,7 +222,7 @@ G4VPhysicalVolume* DetectorConstructionDet::Construct()
   
   double temperature, pressure;
   G4Material* vacuum = new G4Material(name="Vacuum", density=2.376e-15*g/cm3, ncomponents=1,
-				      kStateGas,temperature=300*kelvin,pressure=2.0e-7*bar);
+				      kStateGas, temperature=300*kelvin, pressure=2.0e-7*bar);
   vacuum->AddMaterial(air, 1.);
   
 
@@ -230,7 +230,7 @@ G4VPhysicalVolume* DetectorConstructionDet::Construct()
   G4Material* rock = new G4Material("StandardRock",
                                      2.65*CLHEP::g/CLHEP::cm3, 1, kStateSolid);
   rock->AddElement(Na, 1);
-
+  
   G4cout << G4endl << "The materials defined are : " << G4endl << G4endl;
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 
